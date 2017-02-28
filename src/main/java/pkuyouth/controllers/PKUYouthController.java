@@ -81,19 +81,7 @@ public class PKUYouthController {
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     @ResponseBody
     public BasicVO search(@RequestParam String content) {
-        SearchArticleVO searchArticleVO = new SearchArticleVO();
-        searchArticleVO.setArticle_count(3);
-        Article[] articles = new Article[3];
-        for (int i = 0; i < articles.length; i++) {
-            articles[i] = new Article();
-            articles[i].setId(12345);
-            articles[i].setDesc("除夕是团圆的日子，某种意义上，过去一整年的欢笑、欣慰、苦痛、辛酸都是为了今天。为了今天，腊八的蒜、小年的饭、门上的福、元宵的灯，甚至还有回家的车票……一切都会被早早准备好。街上卖春联的小摊摆出来的时候，或许就是春节最初的起点。");
-            articles[i].setTitle("年味｜有了这些，才过了年");
-            articles[i].setPic_url("http://mmbiz.qpic.cn/mmbiz_jpg/l9iadYXd83Z4mOaohfrSJZ8tczmsMicYHic3FiaT2wHcxetSibEba9ia7cmcAMsZUbEaIjwIH32o6EhtRFEwxbrI5iaicg/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1");
-            articles[i].setUrl("http://mp.weixin.qq.com/s?__biz=MzA3NzAzMDEyNg==&mid=2650825896&idx=1&sn=6f8f467a98c2f7c20dddb6230f355ace&chksm=84acf329b3db7a3fb12226761cce0cee735f18d6b8c4525fe7a9f6ce526b4bc4ed41c897488f#rd");
-        }
-        searchArticleVO.setArticles(articles);
-        return searchArticleVO;
+        return pkuYouthService.searchArticle(content);
     }
 
     //换一批

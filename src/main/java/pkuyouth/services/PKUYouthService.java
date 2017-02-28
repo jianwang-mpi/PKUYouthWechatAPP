@@ -7,4 +7,5 @@ import pkuyouth.responsevos.SearchArticleVO;
  */
 public interface PKUYouthService {
     SearchArticleVO replaceArticle();
+    SearchArticleVO searchArticle(String searchContent);
 }
