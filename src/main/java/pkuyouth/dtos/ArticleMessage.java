@@ -4,19 +4,19 @@ package pkuyouth.dtos;
  * Created by WangJian on 2017/2/18.
  */
 public class ArticleMessage {
-    private Integer id;
+    private Integer ANo;
     private String time;
     private String title;
     private String description;
     private String picurl;
     private String url;
 
-    public Integer getId() {
-        return id;
+    public Integer getANo() {
+        return ANo;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setANo(Integer ANo) {
+        this.ANo = ANo;
     }
 
     public String getTime() {

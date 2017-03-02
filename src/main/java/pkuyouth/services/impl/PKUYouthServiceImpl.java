@@ -42,6 +42,7 @@ public class PKUYouthServiceImpl implements PKUYouthService {
     @Override
     public SearchArticleVO searchArticle(String searchContent) {
         List<ArticleMessage> searchResult = articleMessageMapper.searchArticlesByTitle(searchContent);
+
         return createSearchArticleVO(searchResult);
     }
 
@@ -52,7 +53,7 @@ public class PKUYouthServiceImpl implements PKUYouthService {
         for(int i = 0;i<articles.length;i++){
             articles[i] = new Article();
             articles[i].setTitle(articleMessages.get(i).getTitle());
-            articles[i].setId(articleMessages.get(i).getId());
+            articles[i].setId(articleMessages.get(i).getANo());
             articles[i].setDesc(articleMessages.get(i).getDescription());
             articles[i].setUrl(articleMessages.get(i).getUrl());
             articles[i].setPic_url(articleMessages.get(i).getPicurl());
