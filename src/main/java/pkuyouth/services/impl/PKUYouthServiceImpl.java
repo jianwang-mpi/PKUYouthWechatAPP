@@ -42,7 +42,9 @@ public class PKUYouthServiceImpl implements PKUYouthService {
     @Override
     public SearchArticleVO searchArticle(String searchContent) {
         List<ArticleMessage> searchResult = articleMessageMapper.searchArticlesByTitle(searchContent);
-
+        List<ArticleMessage> searchResultByContent = articleMessageMapper.searchArticlesByContent(searchContent);
+        List<ArticleMessage> searchResultByTime = articleMessageMapper.searchArticlesByTime(searchContent);
+        searchResult.addAll(searchResultByContent);
         return createSearchArticleVO(searchResult);
     }
 

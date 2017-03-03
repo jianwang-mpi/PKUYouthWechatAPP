@@ -18,4 +18,8 @@ public interface ArticleMessageMapper {
     List<ArticleMessage> getArticleMessages();
     @Select("select * from articlemessage where title like CONCAT('%',#{title},'%' );")
     List<ArticleMessage> searchArticlesByTitle(@Param("title") String title);
+    @Select("select * from articlemessage where ANo in (select ANo from articlefulltext where Text like CONCAT('%',#{content},'%' ));")
+    List<ArticleMessage> searchArticlesByContent(@Param("content") String content);
+    @Select("select * from articlemessage where time = #{time}")
+    List<ArticleMessage> searchArticlesByTime(@Param("time") String time);
 }
