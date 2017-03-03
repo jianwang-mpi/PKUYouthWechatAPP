@@ -10,6 +10,7 @@ import javax.annotation.Resource;
  * Created by WangJian on 2017/1/30.
  */
 @Service("searchArticleService")
+@Deprecated
 public class SearchArticleService {
     @Resource
     UserMapper userMapper;

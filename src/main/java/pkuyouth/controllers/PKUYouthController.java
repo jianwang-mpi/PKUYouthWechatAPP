@@ -1,14 +1,16 @@
 package pkuyouth.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.*;
 import pkuyouth.requestobjects.*;
 import pkuyouth.responsevos.*;
-import pkuyouth.services.PKUYouthService;
-import pkuyouth.services.SearchArticleService;
-import org.springframework.web.bind.annotation.*;
+import pkuyouth.services.ApproveService;
+import pkuyouth.services.ArticleService;
+import pkuyouth.services.CollectService;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Date;
 
 /**
  * Created by WangJian on 2017/1/29.
@@ -16,8 +18,14 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = "/pkuyouth")
 public class PKUYouthController {
+    private static Logger logger = LoggerFactory.getLogger(PKUYouthController.class);
+
     @Resource
-    PKUYouthService pkuYouthService;
+    ArticleService articleService;
+    @Resource
+    CollectService collectService;
+    @Resource
+    ApproveService approveService;
 
     //评论
     @RequestMapping(value = "/comment", method = RequestMethod.POST)
@@ -32,16 +40,34 @@ public class PKUYouthController {
     @RequestMapping(value = "/collect", method = RequestMethod.POST)
     @ResponseBody
     public BasicVO collect(@RequestBody CollectObject collectObject) {
+        BasicVO collectVO;
         //TODO
-        return new SuccessVO();
+        try {
+            collectService.addCollect(collectObject);
+            collectVO = new SuccessVO();
+        } catch (Exception e) {
+            collectVO = new ErrorVO(3, "收藏失败");
+            e.printStackTrace();
+            logger.error(new Date().toString() + "收藏失败", e);
+        }
+        return collectVO;
     }
 
     //点赞
     @RequestMapping(value = "/approve", method = RequestMethod.POST)
     @ResponseBody
     public BasicVO approve(@RequestBody ApproveObject approveObject) {
+        BasicVO approveVO;
         //TODO
-        return new SuccessVO();
+        try {
+            approveService.manageApprove(approveObject);
+            approveVO = new SuccessVO();
+        } catch (Exception e) {
+            approveVO = new ErrorVO(4, "赞赏失败");
+            e.printStackTrace();
+            logger.error(new Date().toString() + "赞赏失败", e);
+        }
+        return approveVO;
     }
 
     //意见反馈
@@ -81,16 +107,32 @@ public class PKUYouthController {
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     @ResponseBody
     public BasicVO search(@RequestParam String content) {
-        return pkuYouthService.searchArticle(content);
+        BasicVO searchArticleVO;
+        try {
+            searchArticleVO = articleService.searchArticle(content);
+        } catch (Exception e) {
+            searchArticleVO = new ErrorVO(2, "搜索文章发生错误");
+            e.printStackTrace();
+            logger.error(new Date().toString() + "搜索文章发生错误", e);
+        }
+        return searchArticleVO;
     }
 
     //换一批
     @RequestMapping(value = "/replace", method = RequestMethod.GET)
     @ResponseBody
     public BasicVO replace() {
-        SearchArticleVO searchArticleVO = pkuYouthService.replaceArticle();
-        return searchArticleVO;
+        BasicVO replaceArticleVO;
+        try {
+            replaceArticleVO = articleService.replaceArticle();
+        } catch (Exception e) {
+            replaceArticleVO = new ErrorVO(1, "替换文章发生错误");
+            e.printStackTrace();
+            logger.error(new Date().toString() + "替换文章发生错误", e);
+        }
+        return replaceArticleVO;
     }
+    /*
     @Resource
     SearchArticleService searchArticleService;
 
@@ -104,4 +146,5 @@ public class PKUYouthController {
         System.out.println(searchArticleService.getUser(1).getName());
         return result;
     }
+    */
 }

@@ -6,22 +6,20 @@ import org.springframework.stereotype.Service;
 import pkuyouth.constants.Constants;
 import pkuyouth.dao.ArticleMessageMapper;
 import pkuyouth.dtos.ArticleMessage;
-import pkuyouth.responsevos.Article;
+import pkuyouth.responsevos.ArticleVO;
 import pkuyouth.responsevos.SearchArticleVO;
-import pkuyouth.services.PKUYouthService;
+import pkuyouth.services.ArticleService;
+import pkuyouth.utils.TimeUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by WangJian on 2017/2/18.
  */
 @Service
-public class PKUYouthServiceImpl implements PKUYouthService {
-    private static Logger logger = LoggerFactory.getLogger(PKUYouthServiceImpl.class);
+public class ArticleServiceImpl implements ArticleService {
+    private static Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     @Resource
     ArticleMessageMapper articleMessageMapper;
 
@@ -41,26 +39,33 @@ public class PKUYouthServiceImpl implements PKUYouthService {
 
     @Override
     public SearchArticleVO searchArticle(String searchContent) {
-        List<ArticleMessage> searchResult = articleMessageMapper.searchArticlesByTitle(searchContent);
-        List<ArticleMessage> searchResultByContent = articleMessageMapper.searchArticlesByContent(searchContent);
-        List<ArticleMessage> searchResultByTime = articleMessageMapper.searchArticlesByTime(searchContent);
-        searchResult.addAll(searchResultByContent);
+        String parsedTime = TimeUtils.parseTime(searchContent);
+        List<ArticleMessage> searchResult = new LinkedList<ArticleMessage>();
+        if(parsedTime == null) {
+            List<ArticleMessage> searchResultByTitle = articleMessageMapper.searchArticlesByTitle(searchContent);
+            List<ArticleMessage> searchResultByContent = articleMessageMapper.searchArticlesByContent(searchContent);
+            searchResult.addAll(searchResultByTitle);
+            searchResult.addAll(searchResultByContent);
+        }else {
+            List<ArticleMessage> searchResultByTime = articleMessageMapper.searchArticlesByTime(searchContent);
+            searchResult.addAll(searchResultByTime);
+        }
         return createSearchArticleVO(searchResult);
     }
 
     private SearchArticleVO createSearchArticleVO(List<ArticleMessage> articleMessages){
         SearchArticleVO searchArticleVO = new SearchArticleVO();
         searchArticleVO.setArticle_count(articleMessages.size());
-        Article [] articles = new Article[articleMessages.size()];
-        for(int i = 0;i<articles.length;i++){
-            articles[i] = new Article();
-            articles[i].setTitle(articleMessages.get(i).getTitle());
-            articles[i].setId(articleMessages.get(i).getANo());
-            articles[i].setDesc(articleMessages.get(i).getDescription());
-            articles[i].setUrl(articleMessages.get(i).getUrl());
-            articles[i].setPic_url(articleMessages.get(i).getPicurl());
+        ArticleVO[] articleVOs = new ArticleVO[articleMessages.size()];
+        for(int i = 0; i< articleVOs.length; i++){
+            articleVOs[i] = new ArticleVO();
+            articleVOs[i].setTitle(articleMessages.get(i).getTitle());
+            articleVOs[i].setId(articleMessages.get(i).getANo());
+            articleVOs[i].setDesc(articleMessages.get(i).getDescription());
+            articleVOs[i].setUrl(articleMessages.get(i).getUrl());
+            articleVOs[i].setPic_url(articleMessages.get(i).getPicurl());
         }
-        searchArticleVO.setArticles(articles);
+        searchArticleVO.setArticleVOs(articleVOs);
         return searchArticleVO;
     }
     @Deprecated

@@ -5,7 +5,7 @@ package pkuyouth.responsevos;
  */
 public class SearchArticleVO extends BasicVO {
     int article_count;
-    Article [] articles;
+    ArticleVO[] articleVOs;
 
     public int getArticle_count() {
         return article_count;
@@ -15,11 +15,11 @@ public class SearchArticleVO extends BasicVO {
         this.article_count = article_count;
     }
 
-    public Article[] getArticles() {
-        return articles;
+    public ArticleVO[] getArticleVOs() {
+        return articleVOs;
     }
 
-    public void setArticles(Article[] articles) {
-        this.articles = articles;
+    public void setArticleVOs(ArticleVO[] articleVOs) {
+        this.articleVOs = articleVOs;
     }
 }

@@ -3,7 +3,7 @@ package pkuyouth.responsevos;
 /**
  * Created by WangJian on 2017/1/30.
  */
-public class Article {
+public class ArticleVO {
     int id;
     String title;
     String desc;
