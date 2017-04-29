@@ -14,7 +14,13 @@ import javax.annotation.Resource;
 public class CollectServiceImpl implements CollectService {
     @Resource
     CollectMapper collectMapper;
-    public void addCollect(CollectObject collectObject){
-        collectMapper.collect(collectObject.getUser_id(),Integer.parseInt(collectObject.getArticle_id()));
+    public void collect(CollectObject collectObject){
+        String user_id = collectObject.getUser_id();
+        Integer article_id = Integer.parseInt(collectObject.getArticle_id());
+        if(collectMapper.findCollect(user_id,article_id)<=0) {
+            collectMapper.addCollect(user_id,article_id);
+        }else{
+            collectMapper.deleteCollect(user_id,article_id);
+        }
     }
 }

@@ -43,7 +43,7 @@ public class PKUYouthController {
         BasicVO collectVO;
         //TODO
         try {
-            collectService.addCollect(collectObject);
+            collectService.collect(collectObject);
             collectVO = new SuccessVO();
         } catch (Exception e) {
             collectVO = new ErrorVO(3, "收藏失败");
