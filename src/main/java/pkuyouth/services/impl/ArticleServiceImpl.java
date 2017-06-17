@@ -25,7 +25,6 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public SearchArticleVO replaceArticle() {
-
         List<ArticleMessage> articleMessageList = articleMessageMapper.getArticleMessages();
         List<ArticleMessage> selectResult = new ArrayList<ArticleMessage>(Constants.replaceArticleNumber);
         int interval = articleMessageList.size() / Constants.replaceArticleNumber;
