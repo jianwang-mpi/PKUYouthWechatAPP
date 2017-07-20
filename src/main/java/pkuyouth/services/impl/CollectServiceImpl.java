@@ -3,9 +3,11 @@ package pkuyouth.services.impl;
 import org.springframework.stereotype.Service;
 import pkuyouth.dao.CollectMapper;
 import pkuyouth.requestobjects.CollectObject;
+import pkuyouth.responsevos.SearchArticleVO;
 import pkuyouth.services.CollectService;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * Created by WangJian on 2017/3/3.
@@ -22,5 +24,12 @@ public class CollectServiceImpl implements CollectService {
         }else{
             collectMapper.deleteCollect(user_id,article_id);
         }
+    }
+
+    @Override
+    public SearchArticleVO showCollect(String userId) {
+        List<Integer> articleIds = collectMapper.getCollectByUser(userId);
+
+        return null;
     }
 }

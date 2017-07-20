@@ -89,6 +89,11 @@ public class ArticleServiceImpl implements ArticleService {
         return result;
     }
 
+    @Override
+    public SearchArticleVO searchArticleById(List<Integer> articleIds) {
+        return null;
+    }
+
     private SearchArticleVO createSearchArticleVO(List<ArticleMessage> articleMessages){
         SearchArticleVO searchArticleVO = new SearchArticleVO();
         searchArticleVO.setArticle_count(articleMessages.size());

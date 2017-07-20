@@ -8,6 +8,7 @@ import pkuyouth.responsevos.*;
 import pkuyouth.services.ApproveService;
 import pkuyouth.services.ArticleService;
 import pkuyouth.services.CollectService;
+import pkuyouth.services.CommentService;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -26,6 +27,8 @@ public class PKUYouthController {
     CollectService collectService;
     @Resource
     ApproveService approveService;
+    @Resource
+    private CommentService commentService;
 
     // 登录
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -39,13 +42,31 @@ public class PKUYouthController {
     public
     @ResponseBody
     BasicVO comment(@RequestBody CommentObject commentObject) {
-        //TODO
-        return new SuccessVO(1);
+        try {
+            commentService.comment(commentObject.getUser_id(), Integer.valueOf(commentObject.getArticle_id()), commentObject.getUser_name(), commentObject.getUser_pic_url(), commentObject.getComment());
+            return new SuccessVO(1);
+        }catch (Exception e){
+            return new ErrorVO(6, "评论失败");
+        }
     }
+
+    //删除评论
+    @RequestMapping(value = "/cancel_comment", method = RequestMethod.POST)
+    @ResponseBody
+    public BasicVO cancelComment(@RequestBody CancelCommentObject cancelCommentObject) {
+        try {
+            commentService.deleteComment(cancelCommentObject.getUser_id(), Integer.valueOf(cancelCommentObject.getArticle_id()), cancelCommentObject.getComment_id());
+            BasicVO result = new SuccessVO(1);
+            return result;
+        } catch (Exception e) {
+            return new ErrorVO(5, "删除评论出错");
+        }
+    }
+
     // 读者查看收藏
     @RequestMapping(value = "/view_collect", method = RequestMethod.POST)
     @ResponseBody
-    public BasicVO viewCollect(@RequestBody ViewCollectObject viewCollectObject){
+    public BasicVO viewCollect(@RequestBody ViewCollectObject viewCollectObject) {
         ViewCollectVO viewCollectVO = new ViewCollectVO();
         viewCollectVO.setApprove(1);
         viewCollectVO.setCollect(1);
@@ -69,9 +90,10 @@ public class PKUYouthController {
     // 取消收藏
     @RequestMapping(value = "/cancel_collect", method = RequestMethod.POST)
     @ResponseBody
-    public BasicVO cancelCollect(@RequestBody CancelCollectObject cancelCollectObject){
+    public BasicVO cancelCollect(@RequestBody CancelCollectObject cancelCollectObject) {
         return new SuccessVO(1);
     }
+
     //收藏
     @RequestMapping(value = "/collect", method = RequestMethod.POST)
     @ResponseBody
@@ -88,10 +110,11 @@ public class PKUYouthController {
         }
         return collectVO;
     }
+
     // 取消赞
     @RequestMapping(value = "/cancel_approve", method = RequestMethod.POST)
     @ResponseBody
-    public BasicVO cancelApprove(@RequestBody CancelApproveObject cancelApproveObject){
+    public BasicVO cancelApprove(@RequestBody CancelApproveObject cancelApproveObject) {
         return new SuccessVO(1);
     }
 
@@ -127,8 +150,8 @@ public class PKUYouthController {
         try {
             ShowArticleVO showArticleVO = articleService.showArticle(showArticleObject.getArticle_id(), showArticleObject.getUser_id());
             return showArticleVO;
-        }catch (Exception e){
-            BasicVO result = new ErrorVO(3,"文章读取失败");
+        } catch (Exception e) {
+            BasicVO result = new ErrorVO(3, "文章读取失败");
             return result;
         }
     }
