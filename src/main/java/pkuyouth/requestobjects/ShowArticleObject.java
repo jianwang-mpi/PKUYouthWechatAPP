@@ -4,8 +4,8 @@ package pkuyouth.requestobjects;
  * Created by WangJian on 2017/1/30.
  */
 public class ShowArticleObject {
-    String user_id;
-    String article_id;
+    private String user_id;
+    private String article_id;
 
     public String getUser_id() {
         return user_id;

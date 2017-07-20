@@ -4,11 +4,12 @@ package pkuyouth.responsevos;
  * Created by WangJian on 2017/1/30.
  */
 public class ArticleVO {
-    int id;
-    String title;
-    String desc;
-    String pic_url;
-    String url;
+    private int id;
+    private String title;
+    private String desc;
+    private String pic_url;
+    private String url;
+
 
     public int getId() {
         return id;

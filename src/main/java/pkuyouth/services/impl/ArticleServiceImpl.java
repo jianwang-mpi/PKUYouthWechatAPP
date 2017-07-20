@@ -1,17 +1,29 @@
 package pkuyouth.services.impl;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pkuyouth.constants.Constants;
+import pkuyouth.dao.ApproveMapper;
 import pkuyouth.dao.ArticleMessageMapper;
+import pkuyouth.dao.CollectMapper;
+import pkuyouth.dao.CommentMapper;
 import pkuyouth.dtos.ArticleMessage;
 import pkuyouth.responsevos.ArticleVO;
+import pkuyouth.responsevos.Comment;
 import pkuyouth.responsevos.SearchArticleVO;
+import pkuyouth.responsevos.ShowArticleVO;
 import pkuyouth.services.ArticleService;
 import pkuyouth.utils.TimeUtils;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -21,7 +33,13 @@ import java.util.*;
 public class ArticleServiceImpl implements ArticleService {
     private static Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     @Resource
-    ArticleMessageMapper articleMessageMapper;
+    private ArticleMessageMapper articleMessageMapper;
+    @Resource
+    private CommentMapper commentMapper;
+    @Resource
+    private ApproveMapper approveMapper;
+    @Resource
+    private CollectMapper collectMapper;
 
     @Override
     public SearchArticleVO replaceArticle() {
@@ -52,6 +70,25 @@ public class ArticleServiceImpl implements ArticleService {
         return createSearchArticleVO(searchResult);
     }
 
+    @Override
+    public ShowArticleVO showArticle(String articleIdString, String userId) {
+        Integer articleId = Integer.valueOf(articleIdString);
+        ArticleMessage article = articleMessageMapper.getArticleMessageById(articleId);
+        ShowArticleVO result = new ShowArticleVO();
+        int isApprove = approveMapper.findApprove(userId, articleId);
+        int isCollect = collectMapper.findCollect(userId, articleId);
+        List<Comment> comments = commentMapper.getArticleComment(articleId);
+        result.setId(article.getANo());
+        result.setTitle(article.getTitle());
+        result.setDesc(article.getDescription());
+        result.setPic_url(article.getPicurl());
+        result.setUrl(article.getUrl());
+        result.setApprove(isApprove);
+        result.setCollect(isCollect);
+        result.setComments((Comment[]) comments.toArray());
+        return result;
+    }
+
     private SearchArticleVO createSearchArticleVO(List<ArticleMessage> articleMessages){
         SearchArticleVO searchArticleVO = new SearchArticleVO();
         searchArticleVO.setArticle_count(articleMessages.size());
@@ -66,6 +103,55 @@ public class ArticleServiceImpl implements ArticleService {
         }
         searchArticleVO.setArticleVOs(articleVOs);
         return searchArticleVO;
+    }
+    private String getArticleContent(String url){
+        Document doc = null;
+        try {
+             doc = Jsoup.connect(url).get();
+        } catch (IOException e) {
+            logger.error("cannot connect the article url");
+            throw new RuntimeException("cannot connect the article url");
+        }
+        Elements p = doc.select("p");
+        StringBuilder result = new StringBuilder();
+        boolean isWrite = true;
+        for (Element e : p) {
+            Elements children = e.children();
+            for(Element img:children){
+                if(img.is("img") && isWrite)
+                    // System.out.println(img);
+                    result.append("<p>"+img+"</p>");
+            }
+            if (haveSubSection(children)) {
+                continue;
+            }
+            String text = e.text();
+            if(StringUtils.isEmpty(text)||StringUtils.isAllBlank(text)){
+                continue;
+            }
+            text = "<p>"+text+"</p>";
+            // System.out.println(text);
+            /*
+            if(text.contains("本报记者")||text.contains("摄影")){
+                isWrite = true;
+            }
+            */
+            if(text.contains("微信编辑")){
+                isWrite = false;
+            }
+            if(isWrite) {
+                result.append(text);
+            }
+        }
+        return result.toString();
+    }
+    private boolean haveSubSection(Elements children) {
+        for (Element e : children) {
+            if (e.is("p")) {
+                return true;
+            }
+        }
+        return false;
     }
     @Deprecated
     private Set<Integer> selectNumber(int totalNumber, int selectNumber) {
