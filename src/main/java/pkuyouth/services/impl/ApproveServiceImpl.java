@@ -25,4 +25,9 @@ public class ApproveServiceImpl implements ApproveService {
             approveMapper.deleteApprove(user_id, article_id);
         }
     }
+
+    @Override
+    public void cancelApprove(String userId, Integer articleId) {
+        approveMapper.deleteApprove(userId, articleId);
+    }
 }

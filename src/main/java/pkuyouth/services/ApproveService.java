@@ -8,4 +8,5 @@ import pkuyouth.requestobjects.ApproveObject;
  */
 public interface ApproveService {
     void manageApprove(ApproveObject approveObject);
+    void cancelApprove(String userId, Integer articleId);
 }

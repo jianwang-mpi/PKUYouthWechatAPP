@@ -23,7 +23,6 @@ import pkuyouth.utils.TimeUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -90,8 +89,15 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public SearchArticleVO searchArticleById(List<Integer> articleIds) {
-        return null;
+    public SearchArticleVO searchArticleByIds(List<Integer> articleIds) {
+        SearchArticleVO result = new SearchArticleVO();
+        result.setArticle_count(articleIds.size());
+        List<ArticleMessage> articleMessages = new LinkedList<ArticleMessage>();
+        for(Integer articleId:articleIds){
+            ArticleMessage articleMessage = articleMessageMapper.getArticleMessageById(articleId);
+            articleMessages.add(articleMessage);
+        }
+        return createSearchArticleVO(articleMessages);
     }
 
     private SearchArticleVO createSearchArticleVO(List<ArticleMessage> articleMessages){

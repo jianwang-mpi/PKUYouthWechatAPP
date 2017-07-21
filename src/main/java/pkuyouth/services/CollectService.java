@@ -9,4 +9,5 @@ import pkuyouth.responsevos.SearchArticleVO;
 public interface CollectService {
     void collect(CollectObject collectObject);
     SearchArticleVO showCollect(String userId);
+    void cancelCollect(String userId, Integer articleId);
 }

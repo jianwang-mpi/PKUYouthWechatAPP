@@ -12,5 +12,5 @@ public interface ArticleService {
     SearchArticleVO replaceArticle();
     SearchArticleVO searchArticle(String searchContent);
     ShowArticleVO showArticle(String articleId, String userId);
-    SearchArticleVO searchArticleById(List<Integer> articleIds);
+    SearchArticleVO searchArticleByIds(List<Integer> articleIds);
 }
