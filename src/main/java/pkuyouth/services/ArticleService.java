@@ -13,4 +13,5 @@ public interface ArticleService {
     SearchArticleVO searchArticle(String searchContent);
     ShowArticleVO showArticle(String articleId, String userId);
     SearchArticleVO searchArticleByIds(List<Integer> articleIds);
+    SearchArticleVO searchSubject(String subject);
 }

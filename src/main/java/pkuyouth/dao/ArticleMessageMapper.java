@@ -12,6 +12,8 @@ import java.util.List;
  */
 @Mapper
 public interface ArticleMessageMapper {
+    @Select("select * from articlemessage where title like CONCAT(#{subject},'%' ) or title like CONCAT('【',#{subject},'】', '%' );")
+    List<ArticleMessage> searchArticleBySubject(@Param("subject")String subject);
     @Select("select * from articlemessage where id = #{id};")
     ArticleMessage getArticleMessageById(@Param("id") int id);
     @Select("select * from articlemessage;")

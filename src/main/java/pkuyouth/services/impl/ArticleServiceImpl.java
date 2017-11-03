@@ -100,6 +100,12 @@ public class ArticleServiceImpl implements ArticleService {
         return createSearchArticleVO(articleMessages);
     }
 
+    @Override
+    public SearchArticleVO searchSubject(String subject) {
+        List<ArticleMessage> articleMessages = articleMessageMapper.searchArticleBySubject(subject);
+        return createSearchArticleVO(articleMessages);
+    }
+
     private SearchArticleVO createSearchArticleVO(List<ArticleMessage> articleMessages){
         SearchArticleVO searchArticleVO = new SearchArticleVO();
         searchArticleVO.setArticle_count(articleMessages.size());

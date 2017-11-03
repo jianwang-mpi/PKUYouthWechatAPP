@@ -70,4 +70,50 @@ public class RegexTest extends BaseTest {
         }
         return false;
     }
+    @Test
+    public void getArticleContent(){
+        String url = "https://mp.weixin.qq.com/s?__biz=MzA3NzAzMDEyNg==&mid=2650824208&idx=1&sn=9ac825dda503ec22a8fc51634f82741a#rd";
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(url).get();
+        } catch (IOException e) {
+            throw new RuntimeException("cannot connect the article url");
+        }
+        // System.out.println(doc.toString());
+        System.out.println("////////////");
+        String document = doc.toString().replaceAll("section", "p");
+        doc = Jsoup.parse(document);
+        Elements p = doc.select("p");
+        StringBuilder result = new StringBuilder();
+        boolean isWrite = true;
+        for (Element e : p) {
+            Elements children = e.children();
+            for(Element img:children){
+                if(img.is("img") && isWrite)
+                    // System.out.println(img);
+                    result.append(img);
+            }
+            if (haveSubSection(children)) {
+                continue;
+            }
+            String text = e.text();
+            if(StringUtils.isEmpty(text)||StringUtils.isAllBlank(text)){
+                continue;
+            }
+            // System.out.println(text);
+            /*
+            if(text.contains("本报记者")||text.contains("摄影")){
+                isWrite = true;
+            }
+            */
+            text = text+"\n";
+            if(text.contains("微信编辑")){
+                isWrite = false;
+            }
+            if(isWrite) {
+                result.append(text);
+            }
+        }
+        System.out.println(result);
+    }
 }

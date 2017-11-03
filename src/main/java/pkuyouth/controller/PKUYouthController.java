@@ -1,5 +1,6 @@
 package pkuyouth.controller;
 
+import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +10,8 @@ import pkuyouth.services.*;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by WangJian on 2017/1/29.
@@ -28,6 +31,24 @@ public class PKUYouthController {
     private CommentService commentService;
     @Resource
     private SuggestionService suggestionService;
+
+    // 获取所有栏目
+    @RequestMapping(value = "/get_all_subject", method = RequestMethod.GET)
+    @ResponseBody
+    public String getAllSubject() {
+        List<SubjectVO> subjectVOList = new LinkedList<SubjectVO>();
+        subjectVOList.add(new SubjectVO("调查","img/diaocha.jpg"));
+        subjectVOList.add(new SubjectVO("雕龙","img/diaolong.jpg"));
+        subjectVOList.add(new SubjectVO("光阴","img/guangyin.jpg"));
+        subjectVOList.add(new SubjectVO("机动","img/jidong.jpg"));
+        subjectVOList.add(new SubjectVO("评论","img/pinglun.jpg"));
+        subjectVOList.add(new SubjectVO("人物","img/renwu.jpg"));
+        subjectVOList.add(new SubjectVO("视界","img/shijie.jpg"));
+        subjectVOList.add(new SubjectVO("特稿","img/tegao.jpg"));
+        subjectVOList.add(new SubjectVO("言己","img/yanji.jpg"));
+        subjectVOList.add(new SubjectVO("姿势","img/zishi.jpg"));
+        return JSON.toJSONString(subjectVOList);
+    }
 
     // 登录
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -155,6 +176,23 @@ public class PKUYouthController {
             BasicVO result = new ErrorVO(3, "文章读取失败");
             return result;
         }
+    }
+
+    //搜索栏目
+    @RequestMapping(value = "/subject", method = RequestMethod.POST)
+    @ResponseBody
+    public BasicVO subject(@RequestBody SubjectObject subjectObject) {
+        String subject = subjectObject.getSubject();
+        BasicVO subjectVO;
+        try {
+            subjectVO = articleService.searchSubject(subject);
+        } catch (Exception e) {
+            subjectVO = new ErrorVO(2, "搜索栏目发生错误");
+            e.printStackTrace();
+            logger.error(new Date().toString() + "搜索栏目发生错误", e);
+        }
+
+        return subjectVO;
     }
 
     //搜索
