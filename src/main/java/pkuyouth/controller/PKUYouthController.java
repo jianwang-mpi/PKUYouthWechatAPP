@@ -37,16 +37,17 @@ public class PKUYouthController {
     @ResponseBody
     public String getAllSubject() {
         List<SubjectVO> subjectVOList = new LinkedList<SubjectVO>();
-        subjectVOList.add(new SubjectVO("调查","img/diaocha.jpg"));
-        subjectVOList.add(new SubjectVO("雕龙","img/diaolong.jpg"));
-        subjectVOList.add(new SubjectVO("光阴","img/guangyin.jpg"));
-        subjectVOList.add(new SubjectVO("机动","img/jidong.jpg"));
-        subjectVOList.add(new SubjectVO("评论","img/pinglun.jpg"));
-        subjectVOList.add(new SubjectVO("人物","img/renwu.jpg"));
-        subjectVOList.add(new SubjectVO("视界","img/shijie.jpg"));
-        subjectVOList.add(new SubjectVO("特稿","img/tegao.jpg"));
-        subjectVOList.add(new SubjectVO("言己","img/yanji.jpg"));
-        subjectVOList.add(new SubjectVO("姿势","img/zishi.jpg"));
+        String base = "https://www.pkuyouth.top/";
+        subjectVOList.add(new SubjectVO("调查",base + "img/diaocha.jpg"));
+        subjectVOList.add(new SubjectVO("雕龙",base + "img/diaolong.jpg"));
+        subjectVOList.add(new SubjectVO("光阴",base + "img/guangyin.jpg"));
+        subjectVOList.add(new SubjectVO("机动",base + "img/jidong.jpg"));
+        subjectVOList.add(new SubjectVO("评论",base + "img/pinglun.jpg"));
+        subjectVOList.add(new SubjectVO("人物",base + "img/renwu.jpg"));
+        subjectVOList.add(new SubjectVO("视界",base + "img/shijie.jpg"));
+        subjectVOList.add(new SubjectVO("特稿",base + "img/tegao.jpg"));
+        subjectVOList.add(new SubjectVO("言己",base + "img/yanji.jpg"));
+        subjectVOList.add(new SubjectVO("姿势",base + "img/zishi.jpg"));
         return JSON.toJSONString(subjectVOList);
     }
 
