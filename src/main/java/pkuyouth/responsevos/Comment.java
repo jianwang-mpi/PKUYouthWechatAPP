@@ -9,11 +9,12 @@ public class Comment {
     private String comment;
     private String user_id;
     private Integer id;
+    private String response;
     /////////////////
     private Integer is_user;
     private Integer approve_count;
     private Integer approve;
-    private String response;
+
 
     public String getResponse() {
         return response;
