@@ -4,19 +4,10 @@ package pkuyouth.requestobjects;
  * Created by WangJian on 2017/1/29.
  */
 public class CommentObject {
-    String user_id;
     String article_id;
     String user_name;
     String user_pic_url;
     String comment;
-
-    public String getUser_id() {
-        return user_id;
-    }
-
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
-    }
 
     public String getArticle_id() {
         return article_id;

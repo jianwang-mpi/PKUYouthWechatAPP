@@ -16,9 +16,7 @@ public class ApproveServiceImpl implements ApproveService {
     ApproveMapper approveMapper;
 
     @Override
-    public void manageApprove(ApproveObject approveObject) {
-        String user_id = approveObject.getUser_id();
-        Integer article_id = Integer.parseInt(approveObject.getArticle_id());
+    public void manageApprove(String user_id, Integer article_id) {
         if (approveMapper.findApprove(user_id, article_id) <= 0) {
             approveMapper.approve(user_id, article_id);
         } else {

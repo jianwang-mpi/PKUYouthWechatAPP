@@ -11,7 +11,7 @@ import java.util.List;
 public interface ArticleService {
     SearchArticleVO replaceArticle();
     SearchArticleVO searchArticle(String searchContent);
-    ShowArticleVO showArticle(String articleId, String userId);
+    ShowArticleVO showArticle(Integer articleId, String userId);
     SearchArticleVO searchArticleByIds(List<Integer> articleIds);
     SearchArticleVO searchSubject(String subject);
 }

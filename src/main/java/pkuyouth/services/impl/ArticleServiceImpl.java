@@ -70,8 +70,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public ShowArticleVO showArticle(String articleIdString, String userId) {
-        Integer articleId = Integer.valueOf(articleIdString);
+    public ShowArticleVO showArticle(Integer articleId, String userId) {
         ArticleMessage article = articleMessageMapper.getArticleMessageById(articleId);
         ShowArticleVO result = new ShowArticleVO();
         int isApprove = approveMapper.findApprove(userId, articleId);

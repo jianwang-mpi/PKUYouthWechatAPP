@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import pkuyouth.requestobjects.*;
 import pkuyouth.responsevos.*;
 import pkuyouth.services.*;
+import pkuyouth.utils.RedisUtils;
+import redis.clients.jedis.Jedis;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -22,15 +24,53 @@ public class PKUYouthController {
     private static Logger logger = LoggerFactory.getLogger(PKUYouthController.class);
 
     @Resource
+    private
     ArticleService articleService;
     @Resource
+    private
     CollectService collectService;
     @Resource
+    private
     ApproveService approveService;
     @Resource
     private CommentService commentService;
     @Resource
     private SuggestionService suggestionService;
+    @Resource
+    private LoginService loginService;
+    
+
+    // 取消评论点赞
+    @RequestMapping(value = "/cancel_comment_approve", method = RequestMethod.POST)
+    @ResponseBody
+    public BasicVO cancel_comment_approve(@RequestParam(name = "access_token")String accessToken,
+                                  @RequestParam(name = "article_id")String articleId,
+                                  @RequestParam(name = "comment_id")Integer commentId) {
+        try{
+            String userId = RedisUtils.getUserId(accessToken);
+            commentService.cancelCommentApprove(userId, Integer.valueOf(articleId), commentId);
+            return new SuccessVO();
+        }catch (Exception e){
+            logger.error("cancel comment approve error", e);
+            return new ErrorVO(12, "cancel comment approve error : " + e.getMessage());
+        }
+    }
+
+    // 评论点赞
+    @RequestMapping(value = "/comment_approve", method = RequestMethod.POST)
+    @ResponseBody
+    public BasicVO commentApprove(@RequestParam(name = "access_token")String accessToken,
+                                 @RequestParam(name = "article_id")String articleId,
+                                 @RequestParam(name = "comment_id")Integer commentId) {
+        try{
+            String userId = RedisUtils.getUserId(accessToken);
+            commentService.commentApprove(userId, Integer.valueOf(articleId), commentId);
+            return new SuccessVO();
+        }catch (Exception e){
+            logger.error("comment approve error", e);
+            return new ErrorVO(11, "comment approve error : " + e.getMessage());
+        }
+    }
 
     // 获取所有栏目
     @RequestMapping(value = "/get_all_subject", method = RequestMethod.GET)
@@ -38,16 +78,17 @@ public class PKUYouthController {
     public String getAllSubject() {
         List<SubjectVO> subjectVOList = new LinkedList<SubjectVO>();
         String base = "https://www.pkuyouth.top/";
-        subjectVOList.add(new SubjectVO("调查",base + "img/diaocha.jpg"));
-        subjectVOList.add(new SubjectVO("雕龙",base + "img/diaolong.jpg"));
-        subjectVOList.add(new SubjectVO("光阴",base + "img/guangyin.jpg"));
-        subjectVOList.add(new SubjectVO("机动",base + "img/jidong.jpg"));
-        subjectVOList.add(new SubjectVO("评论",base + "img/pinglun.jpg"));
-        subjectVOList.add(new SubjectVO("人物",base + "img/renwu.jpg"));
-        subjectVOList.add(new SubjectVO("视界",base + "img/shijie.jpg"));
-        subjectVOList.add(new SubjectVO("特稿",base + "img/tegao.jpg"));
-        subjectVOList.add(new SubjectVO("言己",base + "img/yanji.jpg"));
-        subjectVOList.add(new SubjectVO("姿势",base + "img/zishi.jpg"));
+        subjectVOList.add(new SubjectVO("调查", base + "img/diaocha.jpg"));
+        subjectVOList.add(new SubjectVO("雕龙", base + "img/diaolong.jpg"));
+        subjectVOList.add(new SubjectVO("光阴", base + "img/guangyin.jpg"));
+        subjectVOList.add(new SubjectVO("机动", base + "img/jidong.jpg"));
+        subjectVOList.add(new SubjectVO("评论", base + "img/pinglun.jpg"));
+        subjectVOList.add(new SubjectVO("人物", base + "img/renwu.jpg"));
+        subjectVOList.add(new SubjectVO("视界", base + "img/shijie.jpg"));
+        subjectVOList.add(new SubjectVO("特稿", base + "img/tegao.jpg"));
+        subjectVOList.add(new SubjectVO("言己", base + "img/yanji.jpg"));
+        subjectVOList.add(new SubjectVO("姿势", base + "img/zishi.jpg"));
+
         return JSON.toJSONString(subjectVOList);
     }
 
@@ -55,70 +96,83 @@ public class PKUYouthController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ResponseBody
     public BasicVO login(@RequestBody LoginCode loginCode) {
-        return new AccessTokenVO("adsfasdfa");
+        try {
+            String accessToken = loginService.login(loginCode.getCode());
+            return new AccessTokenVO(accessToken);
+        } catch (Exception e) {
+            return new ErrorVO(10, "Login Error");
+        }
     }
 
     //评论
     @RequestMapping(value = "/comment", method = RequestMethod.POST)
     public
     @ResponseBody
-    BasicVO comment(@RequestBody CommentObject commentObject) {
+    BasicVO comment(@RequestBody CommentObject commentObject, @RequestParam(name = "access_token") String accessToken) {
         try {
-            commentService.comment(commentObject.getUser_id(), Integer.valueOf(commentObject.getArticle_id()), commentObject.getUser_name(), commentObject.getUser_pic_url(), commentObject.getComment());
+            String userId = RedisUtils.getUserId(accessToken);
+            commentService.comment(userId, Integer.valueOf(commentObject.getArticle_id()), commentObject.getUser_name(), commentObject.getUser_pic_url(), commentObject.getComment());
             return new SuccessVO(1);
-        }catch (Exception e){
-            return new ErrorVO(6, "评论失败");
+        } catch (Exception e) {
+            return new ErrorVO(6, "评论失败: " + e.getMessage());
         }
     }
 
     //删除评论
     @RequestMapping(value = "/cancel_comment", method = RequestMethod.POST)
     @ResponseBody
-    public BasicVO cancelComment(@RequestBody CancelCommentObject cancelCommentObject) {
+    public BasicVO cancelComment(@RequestBody CancelCommentObject cancelCommentObject,
+                                 @RequestParam(name = "access_token")String accessToken) {
         try {
-            commentService.deleteComment(cancelCommentObject.getUser_id(), Integer.valueOf(cancelCommentObject.getArticle_id()), cancelCommentObject.getComment_id());
+            String userId = RedisUtils.getUserId(accessToken);
+            commentService.deleteComment(userId, Integer.valueOf(cancelCommentObject.getArticle_id()), cancelCommentObject.getComment_id());
             BasicVO result = new SuccessVO(1);
             return result;
         } catch (Exception e) {
-            return new ErrorVO(5, "删除评论出错");
+            return new ErrorVO(5, "删除评论出错"+ e.getMessage());
         }
     }
 
     // 读者查看收藏
-    @RequestMapping(value = "/view_collect", method = RequestMethod.POST)
+    @RequestMapping(value = "/view_collect", method = RequestMethod.GET)
     @ResponseBody
-    public BasicVO viewCollect(@RequestBody ViewCollectObject viewCollectObject) {
-        try{
-            BasicVO basicVO = collectService.showCollect(viewCollectObject.getUser_id());
+    public BasicVO viewCollect(@RequestParam(name = "access_token") String accessToken) {
+        try {
+            String userId = RedisUtils.getUserId(accessToken);
+            BasicVO basicVO = collectService.showCollect(userId);
             return basicVO;
-        }catch (Exception e){
-            return new ErrorVO(7,"查看收藏错误");
+        } catch (Exception e) {
+            return new ErrorVO(7, "查看收藏错误: " + e.getMessage());
         }
     }
 
     // 取消收藏
     @RequestMapping(value = "/cancel_collect", method = RequestMethod.POST)
     @ResponseBody
-    public BasicVO cancelCollect(@RequestBody CancelCollectObject cancelCollectObject) {
-        try{
-            collectService.cancelCollect(cancelCollectObject.getUser_id(), Integer.valueOf(cancelCollectObject.getArticle_id()));
+    public BasicVO cancelCollect(@RequestBody CancelCollectObject cancelCollectObject,
+                                 @RequestParam(name = "access_token") String accessToken) {
+        try {
+            String userId = RedisUtils.getUserId(accessToken);
+            collectService.cancelCollect(userId, Integer.valueOf(cancelCollectObject.getArticle_id()));
             return new SuccessVO(1);
-        }catch (Exception e){
-            return new ErrorVO(8,"取消收藏失败");
+        } catch (Exception e) {
+            return new ErrorVO(8, "取消收藏失败" + e.getMessage());
         }
     }
 
     //收藏
     @RequestMapping(value = "/collect", method = RequestMethod.POST)
     @ResponseBody
-    public BasicVO collect(@RequestBody CollectObject collectObject) {
+    public BasicVO collect(@RequestBody CollectObject collectObject,
+                           @RequestParam(name = "access_token") String accessToken) {
         BasicVO collectVO;
         //TODO
         try {
-            collectService.collect(collectObject);
+            String userId = RedisUtils.getUserId(accessToken);
+            collectService.collect(userId, Integer.valueOf(collectObject.getArticle_id()));
             collectVO = new SuccessVO();
         } catch (Exception e) {
-            collectVO = new ErrorVO(3, "收藏失败");
+            collectVO = new ErrorVO(3, "收藏失败"+e.getMessage());
             e.printStackTrace();
             logger.error(new Date().toString() + "收藏失败", e);
         }
@@ -128,26 +182,30 @@ public class PKUYouthController {
     // 取消赞
     @RequestMapping(value = "/cancel_approve", method = RequestMethod.POST)
     @ResponseBody
-    public BasicVO cancelApprove(@RequestBody CancelApproveObject cancelApproveObject) {
-        try{
-            approveService.cancelApprove(cancelApproveObject.getUser_id(), Integer.valueOf(cancelApproveObject.getArticle_id()));
+    public BasicVO cancelApprove(@RequestParam(name = "article_id") String articleId,
+                                 @RequestParam(name = "access_token") String accessToken) {
+        try {
+            String userId = RedisUtils.getUserId(accessToken);
+            approveService.cancelApprove(userId, Integer.valueOf(articleId));
             return new SuccessVO(1);
-        }catch (Exception e){
+        } catch (Exception e) {
             return new ErrorVO(9, "取消赞失败");
         }
     }
 
-    //点赞
+    // 点赞
     @RequestMapping(value = "/approve", method = RequestMethod.POST)
     @ResponseBody
-    public BasicVO approve(@RequestBody ApproveObject approveObject) {
+    public BasicVO approve(@RequestParam(name = "article_id") String articleId,
+                           @RequestParam(name = "access_token") String accessToken) {
         BasicVO approveVO;
         //TODO
         try {
-            approveService.manageApprove(approveObject);
+            String userId = RedisUtils.getUserId(accessToken);
+            approveService.manageApprove(userId, Integer.valueOf(articleId));
             approveVO = new SuccessVO();
         } catch (Exception e) {
-            approveVO = new ErrorVO(4, "赞赏失败");
+            approveVO = new ErrorVO(4, "赞赏失败: "+ e.getMessage());
             e.printStackTrace();
             logger.error(new Date().toString() + "赞赏失败", e);
         }
@@ -157,11 +215,13 @@ public class PKUYouthController {
     //意见反馈
     @RequestMapping(value = "/suggestion", method = RequestMethod.POST)
     @ResponseBody
-    public BasicVO suggestion(@RequestBody SuggestionObject suggestionObject) {
-        try{
-            suggestionService.suggest(suggestionObject.getUser_id(), suggestionObject.getUser_name(), suggestionObject.getSuggestion());
+    public BasicVO suggestion(@RequestBody SuggestionObject suggestionObject,
+                              @RequestParam(name = "access_token") String accessToken) {
+        try {
+            String userId = RedisUtils.getUserId(accessToken);
+            suggestionService.suggest(userId, suggestionObject.getUser_name(), suggestionObject.getSuggestion());
             return new SuccessVO(1);
-        }catch (Exception e){
+        } catch (Exception e) {
             return new ErrorVO(10, "意见反馈失败");
         }
     }
@@ -169,12 +229,14 @@ public class PKUYouthController {
     //文章展示
     @RequestMapping(value = "/show", method = RequestMethod.POST)
     @ResponseBody
-    public BasicVO show(@RequestBody ShowArticleObject showArticleObject) {
+    public BasicVO show(@RequestParam(name = "article_id") String articleId,
+                        @RequestParam(name = "access_token") String accessToken) {
         try {
-            ShowArticleVO showArticleVO = articleService.showArticle(showArticleObject.getArticle_id(), showArticleObject.getUser_id());
+            String userId = RedisUtils.getUserId(accessToken);
+            ShowArticleVO showArticleVO = articleService.showArticle(Integer.valueOf(articleId), userId);
             return showArticleVO;
         } catch (Exception e) {
-            BasicVO result = new ErrorVO(3, "文章读取失败");
+            BasicVO result = new ErrorVO(3, "文章读取失败:"+e.getMessage());
             return result;
         }
     }
@@ -205,7 +267,7 @@ public class PKUYouthController {
         try {
             searchArticleVO = articleService.searchArticle(content);
         } catch (Exception e) {
-            searchArticleVO = new ErrorVO(2, "搜索文章发生错误");
+            searchArticleVO = new ErrorVO(2, "搜索文章发生错误"+e.getMessage());
             e.printStackTrace();
             logger.error(new Date().toString() + "搜索文章发生错误", e);
         }
@@ -221,7 +283,7 @@ public class PKUYouthController {
         try {
             replaceArticleVO = articleService.replaceArticle();
         } catch (Exception e) {
-            replaceArticleVO = new ErrorVO(1, "替换文章发生错误");
+            replaceArticleVO = new ErrorVO(1, "替换文章发生错误:"+e.getMessage());
             e.printStackTrace();
             logger.error(new Date().toString() + "替换文章发生错误", e);
         }

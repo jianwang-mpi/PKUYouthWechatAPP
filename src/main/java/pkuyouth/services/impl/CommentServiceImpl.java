@@ -13,6 +13,7 @@ import javax.annotation.Resource;
 public class CommentServiceImpl implements CommentService{
     @Resource
     private CommentMapper commentMapper;
+
     @Override
     public void comment(String userId, Integer articleId, String username, String userPicUrl, String comment) {
         commentMapper.addComment(userId, articleId, username,userPicUrl, comment);
@@ -22,4 +23,15 @@ public class CommentServiceImpl implements CommentService{
     public void deleteComment(String userId, Integer articleId, Integer commentId) {
         commentMapper.deleteComment(userId, articleId, commentId);
     }
+
+    @Override
+    public void commentApprove(String userId, Integer articleId, Integer commentId) {
+        commentMapper.commentApprove(articleId, userId, commentId);
+    }
+
+    @Override
+    public void cancelCommentApprove(String userId, Integer articleId, Integer commentId) {
+        commentMapper.deleteCommentApprove(articleId, userId, commentId);
+    }
+
 }

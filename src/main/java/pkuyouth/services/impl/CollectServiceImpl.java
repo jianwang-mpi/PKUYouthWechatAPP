@@ -19,9 +19,7 @@ public class CollectServiceImpl implements CollectService {
     CollectMapper collectMapper;
     @Resource
     private ArticleService articleService;
-    public void collect(CollectObject collectObject){
-        String user_id = collectObject.getUser_id();
-        Integer article_id = Integer.parseInt(collectObject.getArticle_id());
+    public void collect(String user_id, Integer article_id){
         if(collectMapper.findCollect(user_id,article_id)<=0) {
             collectMapper.addCollect(user_id,article_id);
         }else{
