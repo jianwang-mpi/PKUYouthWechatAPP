@@ -14,6 +14,7 @@ import pkuyouth.dao.ArticleMessageMapper;
 import pkuyouth.dao.CollectMapper;
 import pkuyouth.dao.CommentMapper;
 import pkuyouth.dtos.ArticleMessage;
+import pkuyouth.dtos.CommentApprove;
 import pkuyouth.responsevos.ArticleVO;
 import pkuyouth.responsevos.Comment;
 import pkuyouth.responsevos.SearchArticleVO;
@@ -57,12 +58,12 @@ public class ArticleServiceImpl implements ArticleService {
     public SearchArticleVO searchArticle(String searchContent) {
         String parsedTime = TimeUtils.parseTime(searchContent);
         List<ArticleMessage> searchResult = new LinkedList<ArticleMessage>();
-        if(parsedTime == null) {
+        if (parsedTime == null) {
             List<ArticleMessage> searchResultByTitle = articleMessageMapper.searchArticlesByTitle(searchContent);
             List<ArticleMessage> searchResultByContent = articleMessageMapper.searchArticlesByContent(searchContent);
             searchResult.addAll(searchResultByTitle);
             searchResult.addAll(searchResultByContent);
-        }else {
+        } else {
             List<ArticleMessage> searchResultByTime = articleMessageMapper.searchArticlesByTime(searchContent);
             searchResult.addAll(searchResultByTime);
         }
@@ -83,7 +84,24 @@ public class ArticleServiceImpl implements ArticleService {
         result.setUrl(article.getUrl());
         result.setApprove(isApprove);
         result.setCollect(isCollect);
-        result.setComments((Comment[]) comments.toArray());
+        // set comments
+        for (Comment comment : comments) {
+            Integer id = comment.getId();
+            List<CommentApprove> commentApproves = commentMapper.getApprovedComments(articleId, id);
+            comment.setApprove_count(commentApproves.size());
+            if (comment.getUser_id().equals(userId)) {
+                comment.setIs_user(1);
+            } else {
+                comment.setIs_user(0);
+            }
+            comment.setApprove(0);
+            for (CommentApprove commentApprove : commentApproves) {
+                if (commentApprove.getUser_id().equals(userId)) {
+                    comment.setApprove(1);
+                }
+            }
+        }
+        result.setComments(comments);
         return result;
     }
 
@@ -92,7 +110,7 @@ public class ArticleServiceImpl implements ArticleService {
         SearchArticleVO result = new SearchArticleVO();
         result.setArticle_count(articleIds.size());
         List<ArticleMessage> articleMessages = new LinkedList<ArticleMessage>();
-        for(Integer articleId:articleIds){
+        for (Integer articleId : articleIds) {
             ArticleMessage articleMessage = articleMessageMapper.getArticleMessageById(articleId);
             articleMessages.add(articleMessage);
         }
@@ -105,11 +123,11 @@ public class ArticleServiceImpl implements ArticleService {
         return createSearchArticleVO(articleMessages);
     }
 
-    private SearchArticleVO createSearchArticleVO(List<ArticleMessage> articleMessages){
+    private SearchArticleVO createSearchArticleVO(List<ArticleMessage> articleMessages) {
         SearchArticleVO searchArticleVO = new SearchArticleVO();
         searchArticleVO.setArticle_count(articleMessages.size());
         ArticleVO[] articleVOs = new ArticleVO[articleMessages.size()];
-        for(int i = 0; i< articleVOs.length; i++){
+        for (int i = 0; i < articleVOs.length; i++) {
             articleVOs[i] = new ArticleVO();
             articleVOs[i].setTitle(articleMessages.get(i).getTitle());
             articleVOs[i].setId(articleMessages.get(i).getANo());
@@ -120,10 +138,11 @@ public class ArticleServiceImpl implements ArticleService {
         searchArticleVO.setArticleVOs(articleVOs);
         return searchArticleVO;
     }
-    private String getArticleContent(String url){
+
+    private String getArticleContent(String url) {
         Document doc = null;
         try {
-             doc = Jsoup.connect(url).get();
+            doc = Jsoup.connect(url).get();
         } catch (IOException e) {
             logger.error("cannot connect the article url");
             throw new RuntimeException("cannot connect the article url");
@@ -133,34 +152,35 @@ public class ArticleServiceImpl implements ArticleService {
         boolean isWrite = true;
         for (Element e : p) {
             Elements children = e.children();
-            for(Element img:children){
-                if(img.is("img") && isWrite)
+            for (Element img : children) {
+                if (img.is("img") && isWrite)
                     // System.out.println(img);
-                    result.append("<p>"+img+"</p>");
+                    result.append("<p>" + img + "</p>");
             }
             if (haveSubSection(children)) {
                 continue;
             }
             String text = e.text();
-            if(StringUtils.isEmpty(text)||StringUtils.isAllBlank(text)){
+            if (StringUtils.isEmpty(text) || StringUtils.isAllBlank(text)) {
                 continue;
             }
-            text = "<p>"+text+"</p>";
+            text = "<p>" + text + "</p>";
             // System.out.println(text);
             /*
             if(text.contains("本报记者")||text.contains("摄影")){
                 isWrite = true;
             }
             */
-            if(text.contains("微信编辑")){
+            if (text.contains("微信编辑")) {
                 isWrite = false;
             }
-            if(isWrite) {
+            if (isWrite) {
                 result.append(text);
             }
         }
         return result.toString();
     }
+
     private boolean haveSubSection(Elements children) {
         for (Element e : children) {
             if (e.is("p")) {
@@ -169,6 +189,7 @@ public class ArticleServiceImpl implements ArticleService {
         }
         return false;
     }
+
     @Deprecated
     private Set<Integer> selectNumber(int totalNumber, int selectNumber) {
         Set<Integer> resultSet = new HashSet<Integer>(selectNumber);

@@ -38,7 +38,7 @@ public class PKUYouthController {
     private SuggestionService suggestionService;
     @Resource
     private LoginService loginService;
-    
+
 
     // 取消评论点赞
     @RequestMapping(value = "/cancel_comment_approve", method = RequestMethod.POST)

@@ -1,5 +1,7 @@
 package pkuyouth.responsevos;
 
+import java.util.List;
+
 /**
  * Created by WangJian on 2017/1/30.
  */
@@ -11,7 +13,7 @@ public class ShowArticleVO extends BasicVO {
     String url;
     int approve;
     int collect;
-    Comment []comments;
+    List<Comment> comments;
 
     public int getId() {
         return id;
@@ -69,12 +71,11 @@ public class ShowArticleVO extends BasicVO {
         this.collect = collect;
     }
 
-    public Comment[] getComments() {
+    public List<Comment> getComments() {
         return comments;
     }
 
-    public void setComments(Comment[] comments) {
+    public void setComments(List<Comment> comments) {
         this.comments = comments;
     }
-
 }

@@ -4,10 +4,24 @@ package pkuyouth.responsevos;
  * Created by WangJian on 2017/1/30.
  */
 public class Comment {
-    String user_id;
-    String user_name;
-    String user_img_url;
-    String comment;
+    private String user_name;
+    private String user_img_url;
+    private String comment;
+    private String user_id;
+    private Integer id;
+    /////////////////
+    private Integer is_user;
+    private Integer approve_count;
+    private Integer approve;
+    private String response;
+
+    public String getResponse() {
+        return response;
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
+    }
 
     public String getUser_id() {
         return user_id;
@@ -16,6 +30,39 @@ public class Comment {
     public void setUser_id(String user_id) {
         this.user_id = user_id;
     }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getIs_user() {
+        return is_user;
+    }
+
+    public void setIs_user(Integer is_user) {
+        this.is_user = is_user;
+    }
+
+    public Integer getApprove_count() {
+        return approve_count;
+    }
+
+    public void setApprove_count(Integer approve_count) {
+        this.approve_count = approve_count;
+    }
+
+    public Integer getApprove() {
+        return approve;
+    }
+
+    public void setApprove(Integer approve) {
+        this.approve = approve;
+    }
+
 
     public String getUser_name() {
         return user_name;
