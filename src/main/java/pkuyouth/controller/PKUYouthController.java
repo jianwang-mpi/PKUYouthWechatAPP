@@ -44,11 +44,10 @@ public class PKUYouthController {
     @RequestMapping(value = "/cancel_comment_approve", method = RequestMethod.POST)
     @ResponseBody
     public BasicVO cancel_comment_approve(@RequestParam(name = "access_token")String accessToken,
-                                  @RequestParam(name = "article_id")String articleId,
-                                  @RequestParam(name = "comment_id")Integer commentId) {
+                                          @RequestBody ArticleCommentObject articleCommentObject) {
         try{
             String userId = RedisUtils.getUserId(accessToken);
-            commentService.cancelCommentApprove(userId, Integer.valueOf(articleId), commentId);
+            commentService.cancelCommentApprove(userId, Integer.valueOf(articleCommentObject.getArticle_id()), articleCommentObject.getComment_id());
             return new SuccessVO();
         }catch (Exception e){
             logger.error("cancel comment approve error", e);
@@ -60,11 +59,10 @@ public class PKUYouthController {
     @RequestMapping(value = "/comment_approve", method = RequestMethod.POST)
     @ResponseBody
     public BasicVO commentApprove(@RequestParam(name = "access_token")String accessToken,
-                                 @RequestParam(name = "article_id")String articleId,
-                                 @RequestParam(name = "comment_id")Integer commentId) {
+                                 @RequestBody ArticleCommentObject articleCommentObject) {
         try{
             String userId = RedisUtils.getUserId(accessToken);
-            commentService.commentApprove(userId, Integer.valueOf(articleId), commentId);
+            commentService.commentApprove(userId, Integer.valueOf(articleCommentObject.getArticle_id()), articleCommentObject.getComment_id());
             return new SuccessVO();
         }catch (Exception e){
             logger.error("comment approve error", e);
@@ -108,7 +106,8 @@ public class PKUYouthController {
     @RequestMapping(value = "/comment", method = RequestMethod.POST)
     public
     @ResponseBody
-    BasicVO comment(@RequestBody CommentObject commentObject, @RequestParam(name = "access_token") String accessToken) {
+    BasicVO comment(@RequestBody CommentObject commentObject,
+                    @RequestParam(name = "access_token") String accessToken) {
         try {
             String userId = RedisUtils.getUserId(accessToken);
             commentService.comment(userId, Integer.valueOf(commentObject.getArticle_id()), commentObject.getUser_name(), commentObject.getUser_pic_url(), commentObject.getComment());
@@ -182,11 +181,11 @@ public class PKUYouthController {
     // 取消赞
     @RequestMapping(value = "/cancel_approve", method = RequestMethod.POST)
     @ResponseBody
-    public BasicVO cancelApprove(@RequestParam(name = "article_id") String articleId,
+    public BasicVO cancelApprove(@RequestBody ArticleIdObject articleId,
                                  @RequestParam(name = "access_token") String accessToken) {
         try {
             String userId = RedisUtils.getUserId(accessToken);
-            approveService.cancelApprove(userId, Integer.valueOf(articleId));
+            approveService.cancelApprove(userId, Integer.valueOf(articleId.getArticleId()));
             return new SuccessVO(1);
         } catch (Exception e) {
             return new ErrorVO(9, "取消赞失败");
@@ -196,13 +195,13 @@ public class PKUYouthController {
     // 点赞
     @RequestMapping(value = "/approve", method = RequestMethod.POST)
     @ResponseBody
-    public BasicVO approve(@RequestParam(name = "article_id") String articleId,
+    public BasicVO approve(@RequestBody ArticleIdObject articleId,
                            @RequestParam(name = "access_token") String accessToken) {
         BasicVO approveVO;
         //TODO
         try {
             String userId = RedisUtils.getUserId(accessToken);
-            approveService.manageApprove(userId, Integer.valueOf(articleId));
+            approveService.manageApprove(userId, Integer.valueOf(articleId.getArticleId()));
             approveVO = new SuccessVO();
         } catch (Exception e) {
             approveVO = new ErrorVO(4, "赞赏失败: "+ e.getMessage());
@@ -229,11 +228,11 @@ public class PKUYouthController {
     //文章展示
     @RequestMapping(value = "/show", method = RequestMethod.POST)
     @ResponseBody
-    public BasicVO show(@RequestParam(name = "article_id") String articleId,
+    public BasicVO show(@RequestBody ArticleIdObject articleId,
                         @RequestParam(name = "access_token") String accessToken) {
         try {
             String userId = RedisUtils.getUserId(accessToken);
-            ShowArticleVO showArticleVO = articleService.showArticle(Integer.valueOf(articleId), userId);
+            ShowArticleVO showArticleVO = articleService.showArticle(Integer.valueOf(articleId.getArticleId()), userId);
             return showArticleVO;
         } catch (Exception e) {
             BasicVO result = new ErrorVO(3, "文章读取失败:"+e.getMessage());
