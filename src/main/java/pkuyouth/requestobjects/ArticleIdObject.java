@@ -6,11 +6,11 @@ package pkuyouth.requestobjects;
 public class ArticleIdObject {
     private String article_id;
 
-    public String getArticleId() {
+    public String getArticle_id() {
         return article_id;
     }
 
-    public void setArticleId(String articleId) {
-        this.article_id = articleId;
+    public void setArticle_id(String article_id) {
+        this.article_id = article_id;
     }
 }

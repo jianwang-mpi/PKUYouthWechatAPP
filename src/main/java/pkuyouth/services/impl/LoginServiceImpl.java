@@ -2,6 +2,8 @@ package pkuyouth.services.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import pkuyouth.services.LoginService;
@@ -16,9 +18,10 @@ import java.security.SecureRandom;
  */
 @Service
 public class LoginServiceImpl implements LoginService{
+    private static Logger logger = LoggerFactory.getLogger(LoginServiceImpl.class);
     @Value("${appid}")
     private String appid;
-    @Value(("${secret"))
+    @Value(("${secret}"))
     private String secret;
 
     @Override
@@ -31,11 +34,13 @@ public class LoginServiceImpl implements LoginService{
         try {
             loginResponse = HttpClientUtils.get(url);
         }catch (Exception e){
+            logger.error("http get exception", e);
             throw new RuntimeException("Http Get Error", e);
         }
 
         JSONObject jsonObject = JSON.parseObject(loginResponse);
         if(jsonObject.containsKey("errcode")){
+            logger.error(jsonObject.getString("errmsg"));
             throw new RuntimeException("Login error");
         }
         String openid = jsonObject.getString("openid");

@@ -98,6 +98,7 @@ public class PKUYouthController {
             String accessToken = loginService.login(loginCode.getCode());
             return new AccessTokenVO(accessToken);
         } catch (Exception e) {
+            logger.error("login error", e);
             return new ErrorVO(10, "Login Error");
         }
     }
@@ -185,7 +186,7 @@ public class PKUYouthController {
                                  @RequestParam(name = "access_token") String accessToken) {
         try {
             String userId = RedisUtils.getUserId(accessToken);
-            approveService.cancelApprove(userId, Integer.valueOf(articleId.getArticleId()));
+            approveService.cancelApprove(userId, Integer.valueOf(articleId.getArticle_id()));
             return new SuccessVO(1);
         } catch (Exception e) {
             return new ErrorVO(9, "取消赞失败");
@@ -201,7 +202,7 @@ public class PKUYouthController {
         //TODO
         try {
             String userId = RedisUtils.getUserId(accessToken);
-            approveService.manageApprove(userId, Integer.valueOf(articleId.getArticleId()));
+            approveService.manageApprove(userId, Integer.valueOf(articleId.getArticle_id()));
             approveVO = new SuccessVO();
         } catch (Exception e) {
             approveVO = new ErrorVO(4, "赞赏失败: "+ e.getMessage());
@@ -233,7 +234,7 @@ public class PKUYouthController {
                         @RequestParam(name = "access_token") String accessToken) {
         try {
             String userId = RedisUtils.getUserId(accessToken);
-            ShowArticleVO showArticleVO = articleService.showArticle(Integer.valueOf(articleId.getArticleId()), userId);
+            ShowArticleVO showArticleVO = articleService.showArticle(Integer.valueOf(articleId.getArticle_id()), userId);
             return showArticleVO;
         } catch (Exception e) {
             BasicVO result = new ErrorVO(3, "文章读取失败:"+e.getMessage());
