@@ -221,6 +221,7 @@ public class PKUYouthController {
             suggestionService.suggest(userId, suggestionObject.getUser_name(), suggestionObject.getSuggestion());
             return new SuccessVO(1);
         } catch (Exception e) {
+            logger.error("opinion error", e);
             return new ErrorVO(10, "意见反馈失败");
         }
     }
@@ -236,6 +237,7 @@ public class PKUYouthController {
             return showArticleVO;
         } catch (Exception e) {
             BasicVO result = new ErrorVO(3, "文章读取失败:"+e.getMessage());
+            logger.error("article read error", e);
             return result;
         }
     }
@@ -250,10 +252,8 @@ public class PKUYouthController {
             subjectVO = articleService.searchSubject(subject);
         } catch (Exception e) {
             subjectVO = new ErrorVO(2, "搜索栏目发生错误");
-            e.printStackTrace();
             logger.error(new Date().toString() + "搜索栏目发生错误", e);
         }
-
         return subjectVO;
     }
 
